@@ -16,8 +16,7 @@ _logger = logging.getLogger(__name__)
 
 class HKCAlarmControlPanel(CoordinatorEntity, AlarmControlPanelEntity):
     _attr_supported_features = (
-        AlarmControlPanelEntityFeature.ARM_HOME
-        | AlarmControlPanelEntityFeature.ARM_AWAY
+        AlarmControlPanelEntityFeature.ARM_AWAY
         | AlarmControlPanelEntityFeature.ARM_NIGHT
     )
 
@@ -111,13 +110,9 @@ class HKCAlarmControlPanel(CoordinatorEntity, AlarmControlPanelEntity):
         """Send disarm command."""
         await self._send_alarm_command("disarm", 3)
 
-    async def async_alarm_arm_home(self, code: str | None = None) -> None:
-        """Send arm home command."""
-        await self._send_alarm_command("arm_partset_a", 10)
-
     async def async_alarm_arm_night(self, code: str | None = None) -> None:
         """Send arm night command."""
-        await self._send_alarm_command("arm_partset_b", 10)
+        await self._send_alarm_command("arm_partset_a", 10)
 
     async def async_alarm_arm_away(self, code: str | None = None) -> None:
         """Send arm away command."""
@@ -132,10 +127,8 @@ class HKCAlarmControlPanel(CoordinatorEntity, AlarmControlPanelEntity):
             self._attr_alarm_state = AlarmControlPanelState.TRIGGERED
         elif any(block["armState"] == 3 for block in blocks):
             self._attr_alarm_state = AlarmControlPanelState.ARMED_AWAY
-        elif any(block["armState"] == 2 for block in blocks):
-            self._attr_alarm_state = AlarmControlPanelState.ARMED_NIGHT
         elif any(block["armState"] == 1 for block in blocks):
-            self._attr_alarm_state = AlarmControlPanelState.ARMED_HOME
+            self._attr_alarm_state = AlarmControlPanelState.ARMED_NIGHT
         else:
             self._attr_alarm_state = AlarmControlPanelState.DISARMED
 
